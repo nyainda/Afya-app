@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  backend:
+    image: registry.gitlab.com/repository.host/afya_bora:backend-latest
+    environment:
+      - CLOUDINARY_CLOUD_NAME=$CLOUDINARY_CLOUD_NAME
+      - CLOUDINARY_KEY=$CLOUDINARY_KEY
+      - CLOUDINARY_SECRET=$CLOUDINARY_SECRET
+      - COOKIE_SECRET=$COOKIE_SECRET
+      - DOMAIN_URL=$DOMAIN_URL
+      - DATABASE_URL=$DATABASE_URL
+      - STRIPE_SECRET=$STRIPE_SECRET
+      - FRONTEND_URL=$FRONTEND_URL
+      - MAIL_HOST=$MAIL_HOST
+      - MAIL_PORT=$MAIL_PORT
+      - MAIL_USER=$MAIL_USER
+      - MAIL_PASS=$MAIL_PASS
+      - PROD_URL=$PROD_URL
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.constraint-label=cloud-public
+        - traefik.http.routers.afya_bora.entrypoints=websecure
+        - traefik.http.routers.afya_bora.rule=Host(`${BACKEND_DOMAIN}`)
+        - traefik.http.routers.afya_bora.tls=true
+        - traefik.http.routers.afya_bora.tls.options=default
+        - traefik.http.routers.afya_bora.tls.certresolver=letsencrypt
+        - traefik.http.services.afya_bora.loadbalancer.server.port=7771
+    networks:
+      - cloud-public
+
+networks:
+  cloud-public:
+    external: true
